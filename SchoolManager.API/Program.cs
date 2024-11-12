@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManager.Infrastructure.Data;
+using SchoolManager.API.Extensions;
+using SchoolManager.Domain.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<SchoolContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolManager")));
+
+builder.Services.ConfigureServices();
 
 var app = builder.Build();
 
