@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SchoolManager.Domain\SchoolManager.Domain.csproj" />
-    <ProjectReference Include="..\SchoolManager.Infrastructure\SchoolManager.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
