@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using SchoolManager.Domain.DTOs;
 using SchoolManager.Domain.Services.Interfaces;
+using SchoolManager.Domain.Utilities;
 
 namespace SchoolManager.API.Controllers;
 
@@ -9,28 +12,65 @@ public class StudentController(IStudentService studentService) : ControllerBase
 {
     private readonly IStudentService _studentService = studentService;
 
+    [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _studentService.GetAllAsync());
+        Result<IEnumerable<StudentDTO>> data = await _studentService.GetAllAsync();
+
+        if (!data.IsSuccess)
+        {
+            return StatusCode(500, data.Errors);
+        }
+
+        return Ok(data.Value);
     }
 
-    public async Task<IActionResult> GetByIdAsync()
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetByIdAsync([FromRoute] Guid id)
     {
-        throw new NotImplementedException();
+        Result<StudentDTO> data = await _studentService.GetByIdAsync(id);
+
+        if (!data.IsSuccess)
+        {
+            return NotFound();
+        }
+
+        return Ok(data);
     }
 
-    public async Task<IActionResult> CreateAsync()
+    [HttpPost]
+    public async Task<IActionResult> CreateAsync([FromBody] CreateStudentRequest request)
     {
-        throw new NotImplementedException();
+        Result<StudentDTO> data = await _studentService.CreateAsync(request.Name, request.Age);
+
+        if (!data.IsSuccess) 
+        {
+            return StatusCode(500, data.Errors);
+        }
+
+        return Ok(data);
     }
 
-    public async Task<IActionResult> UpdateAsync()
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] Guid id, [FromBody] UpdateStudentRequest request)
     {
-        throw new NotImplementedException();
+        Result<StudentDTO> data = await _studentService.UpdateAsync(id, request.Name, request.Age);
+
+        if (!data.IsSuccess) 
+        {
+            return StatusCode(500, data.Errors);
+        }
+
+        return Ok();
     }
 
+    [HttpDelete]
     public async Task<IActionResult> DeleteAsync()
     {
+        //Adicionar prop Active e fazer um soft delete
         throw new NotImplementedException();
     }
 }
+
+public record CreateStudentRequest(string Name, int Age);
+public record UpdateStudentRequest(string Name, int Age);
